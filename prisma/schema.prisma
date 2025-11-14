@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(cuid())
+  name             String
+  email            String    @unique
+  emailVerified    DateTime?
+  passwordHash     String
+  gender           String
+  dob              DateTime
+  department       String
+  batchYear        Int
+  semester         String
+  semesterNumber   Int
+  universityYear   Int
+  studentId        String?   @unique
+  section          String?
+  creditCompleted  Int?
+  cgpa             Float
+  bio              String?
+  interests        String[]
+  religion         String?
+  familyInfo       String?
+  heightCm         Int?
+  hometown         String?
+  currentCity      String?
+  profilePhotoUrl  String?
+  showFullName     Boolean   @default(true)
+  blurPhoto        Boolean   @default(false)
+  hideCGPA         Boolean   @default(false)
+  role             Role      @default(USER)
+  isApproved       Boolean   @default(false)
+  isBanned         Boolean   @default(false)
+
+  prefMinAge             Int?
+  prefMaxAge             Int?
+  prefDepartment         String?
+  prefMinCgpa            Float?
+  prefMaxCgpa            Float?
+  prefSameDepartment     Boolean? @default(true)
+  prefSimilarCgpa        Boolean? @default(true)
+  prefSameSemesterOrYear Boolean? @default(true)
+
+  matchesInitiated Match[] @relation("initiatorMatches")
+  matchesReceived  Match[] @relation("receiverMatches")
+  messages         Message[] @relation("userMessages")
+  reportsMade      Report[]  @relation("reportsMade")
+  reportsReceived  Report[]  @relation("reportsReceived")
+  blocksInitiated  Block[]   @relation("blocksInitiated")
+  blocksReceived   Block[]   @relation("blocksReceived")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([cgpa])
+  @@index([department])
+  @@index([semester])
+  @@index([universityYear])
+  @@index([batchYear])
+}
+
+model Match {
+  id           String   @id @default(cuid())
+  initiatorId  String
+  receiverId   String
+  score        Int
+  isMutual     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  initiator User @relation("initiatorMatches", fields: [initiatorId], references: [id])
+  receiver  User @relation("receiverMatches", fields: [receiverId], references: [id])
+
+  messages Message[]
+
+  @@unique([initiatorId, receiverId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  matchId   String
+  senderId  String
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  match Match @relation(fields: [matchId], references: [id])
+  sender User @relation("userMessages", fields: [senderId], references: [id])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  reportedId  String
+  reason      String
+  status      ReportStatus @default(PENDING)
+  adminNote   String?
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+
+  reporter User @relation("reportsMade", fields: [reporterId], references: [id])
+  reported User @relation("reportsReceived", fields: [reportedId], references: [id])
+}
+
+model Block {
+  id          String   @id @default(cuid())
+  blockerId   String
+  blockedId   String
+  createdAt   DateTime @default(now())
+
+  blocker User @relation("blocksInitiated", fields: [blockerId], references: [id])
+  blocked User @relation("blocksReceived", fields: [blockedId], references: [id])
+
+  @@unique([blockerId, blockedId])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+

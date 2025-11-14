@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nsumate
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/nsumate?schema=public
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: changeme
+      JWT_SECRET: changeme
+      UNIVERSITY_EMAIL_DOMAIN: nsu.edu
+      ADMIN_EMAIL: admin@nsu.edu
+    ports:
+      - "3000:3000"
+    command: "npm run dev"
+
+volumes:
+  db-data:
+
