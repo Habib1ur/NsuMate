@@ -33,11 +33,11 @@ export default async function BrowsePage({
         Use filters (gender, department, CGPA, semester, year) via query params; this page shows most
         recent profiles.
       </p>
-<div className="grid gap-4">                              
-       {users.map((u: any) => (                                
-         <ProfileCard key={u.id} user={u} showCgpa />          
-       ))}                                                     
-     </div> 
+<div className="grid gap-4">                           
+          {users.map((u: any) => (                             
+            <ProfileCard key={u.id} user={u} showCgpa />       
+          ))}                                                  
+        </div>
     </div>
   );
 }
