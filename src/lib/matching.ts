@@ -1,9 +1,8 @@
 import { prisma } from "./prisma";
-import { User } from "@prisma/client";
 
 // Simple academic-aware matching algorithm.
 // Each criteria contributes points to the total score.
-export function computeMatchScore(a: User, b: User): number {
+export function computeMatchScore(a: any, b: any): number {
   let score = 0;
 
   if (a.department === b.department) {
@@ -97,4 +96,3 @@ export async function ensureMatchBetween(userId: string, otherId: string) {
 
   return match;
 }
-
