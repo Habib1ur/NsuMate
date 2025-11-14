@@ -1,10 +1,9 @@
-import Image from "next/image";
-import { User } from "@prisma/client";
-
-type Props = {
-  user: User;
-  showCgpa: boolean;
-};
+import Image from "next/image";                              
+                                                               
+  type Props = {                                               
+    user: any;                                                 
+    showCgpa: boolean;                                         
+  };  
 
 export function ProfileCard({ user, showCgpa }: Props) {
   const age = Math.floor(
